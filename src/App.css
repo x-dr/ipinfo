@@ -44,3 +44,14 @@ html, body, #root {
   font-weight: bold;
   font-size: 18px;
 }
+
+
+.app-container.dark {
+  background-color: #141414; /* 深色背景 */
+  color: #fff;               /* 深色文字 */
+}
+
+.app-container.light {
+  background-color: #ffffff; /* 浅色背景 */
+  color: #000000;            /* 浅色文字 */
+}
