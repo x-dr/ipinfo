@@ -5,7 +5,7 @@ import './App.css';
 
 function App() {
   const [ipInfo, setIpInfo] = useState(null);
-  const [ipIntInfo, setIpIntInfo] = useState(null);
+  const [ipIntInfo, setIpIntInfo] = useState({ ip: '获取中...' });
   const [loading, setLoading] = useState(false);
   const [followSystem, setFollowSystem] = useState(null);
   const [darkMode, setDarkMode] = useState(null);
@@ -65,22 +65,24 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const fetchIpInfo = async () => {
-
+    const fetchIntIpInfo = async () => {
       try {
         const res = await fetch('https://ip.xxd.workers.dev/');
-        if (!res.ok) throw new Error(`请求失败，状态码 ${res.status}`);
         const data = await res.json();
         setIpIntInfo({
           ip: data.clientIp || '获取失败',
         });
       } catch (error) {
-        message.error('获取IP信息失败：' + error.message);
-      } 
-    };
+        setIpIntInfo({
+          ip: '获取失败',
+        });
+        console.log('获取境外 IP 失败：' + error.message);
 
-    fetchIpInfo();
+      }
+    };
+    fetchIntIpInfo();
   }, []);
+
 
   const handleCopy = async () => {
     if (!ipInfo) return;
