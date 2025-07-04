@@ -5,6 +5,7 @@ import './App.css';
 
 function App() {
   const [ipInfo, setIpInfo] = useState(null);
+  const [ipIntInfo, setIpIntInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [followSystem, setFollowSystem] = useState(null);
   const [darkMode, setDarkMode] = useState(null);
@@ -58,6 +59,24 @@ function App() {
       } finally {
         setLoading(false);
       }
+    };
+
+    fetchIpInfo();
+  }, []);
+
+  useEffect(() => {
+    const fetchIpInfo = async () => {
+
+      try {
+        const res = await fetch('https://ip.xxd.workers.dev/');
+        if (!res.ok) throw new Error(`请求失败，状态码 ${res.status}`);
+        const data = await res.json();
+        setIpIntInfo({
+          ip: data.clientIp || '获取失败',
+        });
+      } catch (error) {
+        message.error('获取IP信息失败：' + error.message);
+      } 
     };
 
     fetchIpInfo();
@@ -184,6 +203,7 @@ function App() {
                 {/* <Descriptions.Item label="区县">{ipInfo.district || '-'}</Descriptions.Item> */}
                 <Descriptions.Item label="经度">{ipInfo.longitude}</Descriptions.Item>
                 <Descriptions.Item label="纬度">{ipInfo.latitude}</Descriptions.Item>
+                <Descriptions.Item label="境外IP">{ipIntInfo.ip}</Descriptions.Item>
                 <Descriptions.Item label="浏览器 UA">
                   <div style={{ wordBreak: 'break-all' }}>{ipInfo.ua}</div>
                 </Descriptions.Item>
