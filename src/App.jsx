@@ -6,7 +6,8 @@ import './App.css';
 function App() {
   const [ipInfo, setIpInfo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false); // 主题切换状态
+  const [followSystem, setFollowSystem] = useState(null);
+  const [darkMode, setDarkMode] = useState(null);
 
 
   useEffect(() => {
@@ -15,26 +16,26 @@ function App() {
       try {
         const res = await fetch('/ip');
         if (!res.ok) throw new Error(`请求失败，状态码 ${res.status}`);
-        const data = {
-          "geo": {
-            "geo": {
-              "asn": 0,
-              "countryName": "China",
-              "countryCodeAlpha2": "CN",
-              "countryCodeAlpha3": "CHN",
-              "countryCodeNumeric": "156",
-              "regionName": "Guangdong",
-              "regionCode": "CN-GD",
-              "cityName": "guang zhou",
-              "latitude": 23.125177,
-              "longitude": 113.28064,
-              "cisp": "Unknown"
-            },
-            "uuid": "15818342190159906526",
-            "clientIp": "14.145.60.239"
-          }
-        }
-        // const data = await res.json();
+        // const data = {
+        //   "geo": {
+        //     "geo": {
+        //       "asn": 0,
+        //       "countryName": "China",
+        //       "countryCodeAlpha2": "CN",
+        //       "countryCodeAlpha3": "CHN",
+        //       "countryCodeNumeric": "1w6",
+        //       "regionName": "Gs",
+        //       "regionCode": "CwD",
+        //       "cityName": "wnww",
+        //       "latitude": 2,
+        //       "longitude": 1,
+        //       "cisp": "Unknown"
+        //     },
+        //     "uuid": "15818306526",
+        //     "clientIp": "14.9"
+        //   }
+        // }
+        const data = await res.json();
 
         const res1 = await fetch(`https://pro.ip-api.com/json/${data.geo.clientIp}?key=EEKS6bLi6D91G1p&lang=zh-CN&fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query`)
         const data1 = await res1.json();
@@ -84,6 +85,68 @@ function App() {
     }
   };
 
+
+  // 初始化，从 localStorage 读取
+  useEffect(() => {
+    const savedFollow = localStorage.getItem('followSystem');
+    const savedDark = localStorage.getItem('darkMode');
+
+    if (savedFollow !== null) {
+      setFollowSystem(savedFollow === 'true');
+      if (savedFollow === 'true') {
+        setDarkMode(null); // 跟随系统，后面监听系统设置
+      } else {
+        setDarkMode(savedDark === 'true');
+      }
+    } else {
+      setFollowSystem(true); // 默认跟随系统
+      setDarkMode(null);
+    }
+  }, []);
+
+  // 监听系统主题，仅当跟随系统时生效
+  useEffect(() => {
+    if (followSystem !== true) return;
+
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    // 初始化同步一次
+    setDarkMode(media.matches);
+
+    const handler = e => setDarkMode(e.matches);
+
+    media.addEventListener('change', handler);
+    return () => media.removeEventListener('change', handler);
+  }, [followSystem]);
+
+  // 状态改变保存 localStorage
+  useEffect(() => {
+    if (followSystem !== null) {
+      localStorage.setItem('followSystem', String(followSystem));
+    }
+    if (darkMode !== null) {
+      localStorage.setItem('darkMode', String(darkMode));
+    }
+  }, [followSystem, darkMode]);
+
+  // 手动切换主题
+  const onThemeSwitch = checked => {
+    setFollowSystem(false);
+    setDarkMode(checked);
+  };
+
+  // 切换是否跟随系统
+  const onFollowSystemSwitch = checked => {
+    setFollowSystem(checked);
+    if (checked) {
+      setDarkMode(null); // 交给系统监听控制
+    }
+  };
+
+  if (followSystem === null || darkMode === null) {
+    // 状态未初始化完成，避免闪烁，返回空或加载中
+    return null;
+  }
+
   return (
 
 
@@ -95,14 +158,11 @@ function App() {
     >
 
 
-
-      {/* <div className="app-container"> */}
-
       <div className={`app-container ${darkMode ? 'dark' : 'light'}`}>
         <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 1000 }}>
           <Switch
             checked={darkMode}
-            onChange={setDarkMode}
+            onChange={onThemeSwitch}
             checkedChildren={<BulbOutlined />}
             unCheckedChildren={<BulbOutlined />}
           />
