@@ -1,9 +1,5 @@
-export async function onRequest(context,env) {
+export async function onRequest({ request, params, env }) {
 
-  const {
-    params, // if filename includes [id] or [[path]]
-
-  } = context;
     
     
     const ip = params.ip || '8.8.8.8'; // Default to a known IP if none provided
