@@ -19,7 +19,7 @@ export async function onRequest({ request, params, env }) {
         });
     }
 
-    return new Response("data", {
+    return new Response(data, {
         headers: {
             'content-type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
