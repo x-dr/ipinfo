@@ -43,13 +43,8 @@ function App() {
         // }
         const data = await res.json();
 
-        // const res1 = await fetch(`https://pro.ip-api.com/json/${data.geo.clientIp}?key=EEKS6bLi6D91G1p&lang=zh-CN&fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query`)
-        // const data1 = await res1.json();
-        // console.log('IP 信息:', data1);
-
-
         const geo = data.geo.geo || {};
-        const meituan = data.meituan.data || {};
+        const meituan = data?.meituan?.data || {};
         setIpInfo({
           ip: data.geo.clientIp || '',
           country: geo.countryName || '',
@@ -58,7 +53,10 @@ function App() {
           district: '', // 你接口没提供区县，留空
           longitude: geo.longitude?.toString() || '',
           latitude: geo.latitude?.toString() || '',
-          ipdetail: `${meituan.country} ${meituan.province} ${meituan.city}${meituan.district || ''}${meituan.detail || ''}(${meituan.areaName || ''})`,
+          ipdetail: meituan
+            ? `${meituan.country || ''} ${meituan.province || ''} ${meituan.city || ''}` +
+            `${meituan.district || ''}${meituan.detail || ''}${meituan.areaName ? `(${meituan.areaName})` : ''}`
+            : '定位信息不可用',
           ua: navigator.userAgent, // 直接用浏览器的UA
 
         });
