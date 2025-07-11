@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { Card, Descriptions, Button, message, Divider, ConfigProvider, Switch, Input, Space, theme } from 'antd';
 import { CopyOutlined, BulbOutlined } from '@ant-design/icons';
 import './App.css';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import TencentMapWithHeightToggle from './TencentMapWithHeightToggle';
+
+// import TencentMapWithHeightToggle from './TencentMapWithHeightToggle';
 
 
 
@@ -47,9 +46,9 @@ function App() {
         const meituan = data?.meituan?.data || {};
         setIpInfo({
           ip: data.geo.clientIp || '',
-          country: geo.countryName || '',
-          province: geo.regionName || '',
-          city: geo.cityName || '',
+          country: meituan.country || geo.countryName || '',
+          province: meituan.province || geo.regionName || '',
+          city: meituan.city || geo.cityName || '',
           district: '', // 你接口没提供区县，留空
           longitude: geo.longitude?.toString() || '',
           latitude: geo.latitude?.toString() || '',
@@ -236,7 +235,7 @@ function App() {
           </Card>
 
 
-          <Card
+          {/* <Card
             title="IP 地图定位"
             className="card-wrapper"
             variant="borderless"
@@ -249,7 +248,7 @@ function App() {
               />
             )}
 
-          </Card>
+          </Card> */}
         </div>
 
 
