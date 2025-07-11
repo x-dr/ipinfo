@@ -22,26 +22,26 @@ function App() {
       try {
         const res = await fetch('/ip');
         if (!res.ok) throw new Error(`请求失败，状态码 ${res.status}`);
-        const data = {
-          "geo": {
-            "geo": {
-              "asn": 0,
-              "countryName": "China",
-              "countryCodeAlpha2": "CN",
-              "countryCodeAlpha3": "CHN",
-              "countryCodeNumeric": "156",
-              "regionName": "Guangdong",
-              "regionCode": "CN-GD",
-              "cityName": "guang zhou",
-              "latitude": 23.125177,
-              "longitude": 113.28064,
-              "cisp": "Unknown"
-            },
-            "uuid": "4661962445463185641",
-            "clientIp": "14.145.66.205"
-          }
-        }
-        // const data = await res.json();
+        // const data = {
+        //   "geo": {
+        //     "geo": {
+        //       "asn": 0,
+        //       "countryName": "China",
+        //       "countryCodeAlpha2": "CN",
+        //       "countryCodeAlpha3": "CHN",
+        //       "countryCodeNumeric": "156",
+        //       "regionName": "Guangdong",
+        //       "regionCode": "CN-GD",
+        //       "cityName": "guang zhou",
+        //       "latitude": 2.77,
+        //       "longitude": 13.28064,
+        //       "cisp": "Unknown"
+        //     },
+        //     "uuid": "4661962445463185641",
+        //     "clientIp": "14.145.66.205"
+        //   }
+        // }
+        const data = await res.json();
 
         // const res1 = await fetch(`https://pro.ip-api.com/json/${data.geo.clientIp}?key=EEKS6bLi6D91G1p&lang=zh-CN&fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query`)
         // const data1 = await res1.json();
