@@ -5,7 +5,7 @@ import './App.css';
 
 // import TencentMapWithHeightToggle from './TencentMapWithHeightToggle';
 
-
+import SpeedPanel from './SpeedPanel';
 
 function App() {
   const [ipInfo, setIpInfo] = useState(null);
@@ -21,26 +21,26 @@ function App() {
       try {
         const res = await fetch('/ip');
         if (!res.ok) throw new Error(`请求失败，状态码 ${res.status}`);
-        // const data = {
-        //   "geo": {
-        //     "geo": {
-        //       "asn": 0,
-        //       "countryName": "China",
-        //       "countryCodeAlpha2": "CN",
-        //       "countryCodeAlpha3": "CHN",
-        //       "countryCodeNumeric": "156",
-        //       "regionName": "Guangdong",
-        //       "regionCode": "CN-GD",
-        //       "cityName": "guang zhou",
-        //       "latitude": 2.77,
-        //       "longitude": 13.28064,
-        //       "cisp": "Unknown"
-        //     },
-        //     "uuid": "4661962445463185641",
-        //     "clientIp": "14.145.66.205"
-        //   }
-        // }
-        const data = await res.json();
+        const data = {
+          "geo": {
+            "geo": {
+              "asn": 0,
+              "countryName": "China",
+              "countryCodeAlpha2": "CN",
+              "countryCodeAlpha3": "CHN",
+              "countryCodeNumeric": "156",
+              "regionName": "Guangdong",
+              "regionCode": "CN-GD",
+              "cityName": "guang zhou",
+              "latitude": 2.77,
+              "longitude": 13.28064,
+              "cisp": "Unknown"
+            },
+            "uuid": "4661962445463185641",
+            "clientIp": "14.145.66.205"
+          }
+        }
+        // const data = await res.json();
 
         const geo = data.geo.geo || {};
         const meituan = data?.meituan?.data || {};
@@ -236,20 +236,21 @@ function App() {
           </Card>
 
 
-          {/* <Card
+          <Card
             title="IP 地图定位"
             className="card-wrapper"
             variant="borderless"
           >
-            {ipInfo?.latitude && ipInfo?.longitude && (
+            {/* {ipInfo?.latitude && ipInfo?.longitude && (
               <TencentMapWithHeightToggle
                 latitude={parseFloat(ipInfo.latitude)}
                 longitude={parseFloat(ipInfo.longitude)}
                 height={134} // 或者你需要的高度
               />
-            )}
+            )} */}
+            <SpeedPanel />
 
-          </Card> */}
+          </Card>
         </div>
 
 
