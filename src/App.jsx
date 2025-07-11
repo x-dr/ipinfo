@@ -49,6 +49,7 @@ function App() {
 
 
         const geo = data.geo.geo || {};
+        const meituan = data.meituan.data || {};
         setIpInfo({
           ip: data.geo.clientIp || '',
           country: geo.countryName || '',
@@ -57,7 +58,9 @@ function App() {
           district: '', // 你接口没提供区县，留空
           longitude: geo.longitude?.toString() || '',
           latitude: geo.latitude?.toString() || '',
+          ipdetail: `${meituan.country} ${meituan.province} ${meituan.city}${meituan.district || ''}${meituan.detail || ''}(${meituan.areaName || ''})`,
           ua: navigator.userAgent, // 直接用浏览器的UA
+
         });
       } catch (error) {
         message.error('获取IP信息失败：' + error.message);
@@ -209,7 +212,7 @@ function App() {
                   <Descriptions.Item label="国家">{ipInfo.country}</Descriptions.Item>
                   <Descriptions.Item label="省份">{ipInfo.province}</Descriptions.Item>
                   <Descriptions.Item label="城市">{ipInfo.city}</Descriptions.Item>
-                  {/* <Descriptions.Item label="区县">{ipInfo.district || '-'}</Descriptions.Item> */}
+                  <Descriptions.Item label="IP 溯源">{ipInfo.ipdetail || '-'}</Descriptions.Item>
                   <Descriptions.Item label="经度">{ipInfo.longitude}</Descriptions.Item>
                   <Descriptions.Item label="纬度">{ipInfo.latitude}</Descriptions.Item>
                   <Descriptions.Item label="境外IP">{ipIntInfo.ip}</Descriptions.Item>
