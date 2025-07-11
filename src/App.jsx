@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { Card, Descriptions, Button, message, Divider, ConfigProvider, Switch, Input, Space, theme } from 'antd';
 import { CopyOutlined, BulbOutlined } from '@ant-design/icons';
 import './App.css';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import TencentMapWithHeightToggle from './TencentMapWithHeightToggle';
+
+
 
 function App() {
   const [ipInfo, setIpInfo] = useState(null);
@@ -17,26 +22,26 @@ function App() {
       try {
         const res = await fetch('/ip');
         if (!res.ok) throw new Error(`请求失败，状态码 ${res.status}`);
-        // const data = {
-        //   "geo": {
-        //     "geo": {
-        //       "asn": 0,
-        //       "countryName": "China",
-        //       "countryCodeAlpha2": "CN",
-        //       "countryCodeAlpha3": "CHN",
-        //       "countryCodeNumeric": "1w6",
-        //       "regionName": "Gs",
-        //       "regionCode": "CwD",
-        //       "cityName": "wnww",
-        //       "latitude": 2,
-        //       "longitude": 1,
-        //       "cisp": "Unknown"
-        //     },
-        //     "uuid": "15818306526",
-        //     "clientIp": "14.9"
-        //   }
-        // }
-        const data = await res.json();
+        const data = {
+          "geo": {
+            "geo": {
+              "asn": 0,
+              "countryName": "China",
+              "countryCodeAlpha2": "CN",
+              "countryCodeAlpha3": "CHN",
+              "countryCodeNumeric": "156",
+              "regionName": "Guangdong",
+              "regionCode": "CN-GD",
+              "cityName": "guang zhou",
+              "latitude": 23.125177,
+              "longitude": 113.28064,
+              "cisp": "Unknown"
+            },
+            "uuid": "4661962445463185641",
+            "clientIp": "14.145.66.205"
+          }
+        }
+        // const data = await res.json();
 
         // const res1 = await fetch(`https://pro.ip-api.com/json/${data.geo.clientIp}?key=EEKS6bLi6D91G1p&lang=zh-CN&fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query`)
         // const data1 = await res1.json();
@@ -189,43 +194,65 @@ function App() {
           />
         </div>
 
-        <Card
-          title="IP 信息查询"
-          variant="borderless"
-          className="card-wrapper"
-          loading={loading}
-        >
-          {ipInfo ? (
-            <>
-              <Descriptions column={1} bordered>
-                <Descriptions.Item label="IP 地址">{ipInfo.ip}</Descriptions.Item>
-                <Descriptions.Item label="国家">{ipInfo.country}</Descriptions.Item>
-                <Descriptions.Item label="省份">{ipInfo.province}</Descriptions.Item>
-                <Descriptions.Item label="城市">{ipInfo.city}</Descriptions.Item>
-                {/* <Descriptions.Item label="区县">{ipInfo.district || '-'}</Descriptions.Item> */}
-                <Descriptions.Item label="经度">{ipInfo.longitude}</Descriptions.Item>
-                <Descriptions.Item label="纬度">{ipInfo.latitude}</Descriptions.Item>
-                <Descriptions.Item label="境外IP">{ipIntInfo.ip}</Descriptions.Item>
-                <Descriptions.Item label="浏览器 UA">
-                  <div style={{ wordBreak: 'break-all' }}>{ipInfo.ua}</div>
-                </Descriptions.Item>
-              </Descriptions>
+        <div>
 
-              <Divider />
+          <Card
+            title="IP 信息查询"
+            variant="borderless"
+            className="card-wrapper"
+            loading={loading}
+          >
+            {ipInfo ? (
+              <>
+                <Descriptions column={1} bordered>
+                  <Descriptions.Item label="IP 地址">{ipInfo.ip}</Descriptions.Item>
+                  <Descriptions.Item label="国家">{ipInfo.country}</Descriptions.Item>
+                  <Descriptions.Item label="省份">{ipInfo.province}</Descriptions.Item>
+                  <Descriptions.Item label="城市">{ipInfo.city}</Descriptions.Item>
+                  {/* <Descriptions.Item label="区县">{ipInfo.district || '-'}</Descriptions.Item> */}
+                  <Descriptions.Item label="经度">{ipInfo.longitude}</Descriptions.Item>
+                  <Descriptions.Item label="纬度">{ipInfo.latitude}</Descriptions.Item>
+                  <Descriptions.Item label="境外IP">{ipIntInfo.ip}</Descriptions.Item>
+                  <Descriptions.Item label="浏览器 UA">
+                    <div style={{ wordBreak: 'break-all' }}>{ipInfo.ua}</div>
+                  </Descriptions.Item>
+                </Descriptions>
 
-              <Button
-                type="primary"
-                icon={<CopyOutlined />}
-                onClick={handleCopy}
-                disabled={loading}
-              >
-                复制 IP + 省份 + 城市
-              </Button>
-            </>
-          ) : (
-            <div>正在加载 IP 信息...</div>
-          )}
-        </Card>
+                <Divider />
+
+                <Button
+                  type="primary"
+                  icon={<CopyOutlined />}
+                  onClick={handleCopy}
+                  disabled={loading}
+                >
+                  复制 IP + 省份 + 城市
+                </Button>
+              </>
+            ) : (
+              <div>正在加载 IP 信息...</div>
+            )}
+          </Card>
+
+
+          <Card
+            title="IP 地图定位"
+            className="card-wrapper"
+            variant="borderless"
+          >
+            {ipInfo?.latitude && ipInfo?.longitude && (
+              <TencentMapWithHeightToggle
+                latitude={parseFloat(ipInfo.latitude)}
+                longitude={parseFloat(ipInfo.longitude)}
+                height={134} // 或者你需要的高度
+              />
+            )}
+
+          </Card>
+        </div>
+
+
+
       </div>
     </ConfigProvider>
   );
