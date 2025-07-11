@@ -49,7 +49,7 @@ function App() {
           country: meituan.country || geo.countryName || '',
           province: meituan.province || geo.regionName || '',
           city: meituan.city || geo.cityName || '',
-          district: '', // 你接口没提供区县，留空
+          district: meituan.district || "", // 你接口没提供区县，留空
           longitude: geo.longitude?.toString() || '',
           latitude: geo.latitude?.toString() || '',
           ipdetail: meituan
@@ -209,6 +209,7 @@ function App() {
                   <Descriptions.Item label="国家">{ipInfo.country}</Descriptions.Item>
                   <Descriptions.Item label="省份">{ipInfo.province}</Descriptions.Item>
                   <Descriptions.Item label="城市">{ipInfo.city}</Descriptions.Item>
+                  <Descriptions.Item label="区县">{ipInfo.district || '-'}</Descriptions.Item>
                   <Descriptions.Item label="IP 溯源">{ipInfo.ipdetail || '-'}</Descriptions.Item>
                   <Descriptions.Item label="经度">{ipInfo.longitude}</Descriptions.Item>
                   <Descriptions.Item label="纬度">{ipInfo.latitude}</Descriptions.Item>
