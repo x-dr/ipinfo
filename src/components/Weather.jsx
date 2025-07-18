@@ -54,8 +54,6 @@ const Weather = () => {
     setLoading(true);
     try {
       const res = await axios.get(`/cyapi`); // mock json
-      // console.log('获取天气数据:', res.data.data.result);
-
       setWeather(res.data.data.result);
       setCity(res.data?.mtjson?.data || {});
     } catch (err) {
@@ -65,7 +63,11 @@ const Weather = () => {
     }
   };
 
+
+
+
   useEffect(() => {
+
     fetchWeather();
   }, []);
 
@@ -91,66 +93,66 @@ const Weather = () => {
     min: item.min,
   }));
 
-const tempChartOption = {
-  title: {
-    text: '未来24小时温度变化',
-    left: 'center'
-  },
-  tooltip: {
-    trigger: 'axis',
-    formatter: function (params) {
-      const item = params[0];
-      return `${item.axisValue} 时<br/>温度：${item.data} ℃`;
-    }
-  },
-  xAxis: {
-    type: 'category',
-    data: hourly.temperature.map(item => item.datetime.slice(11, 16)),
-  },
-  yAxis: {
-    type: 'value',
-    name: '℃'
-  },
-  series: [
-    {
-      data: hourly.temperature.map(item => item.value),
-      type: 'line',
-      smooth: true,
+  const tempChartOption = {
+    title: {
+      text: '未来24小时温度变化',
+      left: 'center'
     },
-  ],
-};
+    tooltip: {
+      trigger: 'axis',
+      formatter: function (params) {
+        const item = params[0];
+        return `${item.axisValue} 时<br/>温度：${item.data} ℃`;
+      }
+    },
+    xAxis: {
+      type: 'category',
+      data: hourly.temperature.map(item => item.datetime.slice(11, 16)),
+    },
+    yAxis: {
+      type: 'value',
+      name: '℃'
+    },
+    series: [
+      {
+        data: hourly.temperature.map(item => item.value),
+        type: 'line',
+        smooth: true,
+      },
+    ],
+  };
 
-const precipitationChartOption = {
-  title: {
-    text: '未来24小时降水变化',
-    subtext: weather.hourly.description,
-    left: 'center'
-  },
-  tooltip: {
-    trigger: 'axis',
-    formatter: function (params) {
-      const item = params[0];
-      return `${item.axisValue} 时<br/>降水强度：${item.data} mm/h`;
-    }
-  },
-  xAxis: {
-    type: 'category',
-    data: weather.hourly.precipitation.map(item => item.datetime.slice(11, 16)),
-  },
-  yAxis: {
-    type: 'value',
-    name: 'mm/h'
-  },
-  series: [
-    {
-      name: '降水强度',
-      data: weather.hourly.precipitation.map(item => item.value),
-      type: 'line',
-      smooth: true,
-      areaStyle: {},
+  const precipitationChartOption = {
+    title: {
+      text: '未来24小时降水变化',
+      subtext: weather.hourly.description,
+      left: 'center'
     },
-  ],
-};
+    tooltip: {
+      trigger: 'axis',
+      formatter: function (params) {
+        const item = params[0];
+        return `${item.axisValue} 时<br/>降水强度：${item.data} mm/h`;
+      }
+    },
+    xAxis: {
+      type: 'category',
+      data: weather.hourly.precipitation.map(item => item.datetime.slice(11, 16)),
+    },
+    yAxis: {
+      type: 'value',
+      name: 'mm/h'
+    },
+    series: [
+      {
+        name: '降水强度',
+        data: weather.hourly.precipitation.map(item => item.value),
+        type: 'line',
+        smooth: true,
+        areaStyle: {},
+      },
+    ],
+  };
 
 
 
