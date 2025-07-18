@@ -286,7 +286,7 @@ const Weather = () => {
     <div className="weather-container">
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <Title level={5} style={{ textAlign: 'center' }}>
-          {city?.province ? `${city.province}省 ` : ''}
+          {city?.province ? `${city.province} ` : ''}
           {city?.city ? `${city.city}市 ` : ''}
           {city?.district || ''}
         </Title>
