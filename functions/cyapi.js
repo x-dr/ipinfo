@@ -10,7 +10,7 @@ export async function onRequest({ request }) {
             'Content-Type': 'application/json',
             'Accept-Encoding': 'gzip,compress,br,deflate',
             'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.61(0x18003d2c) NetType/WIFI Language/zh_CN',
-            'Referer': 'https://servicewechat.com/wx487b4e7c415e06ff/94/page-frame.html'
+            'Referer': 'https://servicewechat.com/wx123456/94/page-frame.html'
         };
 
 
