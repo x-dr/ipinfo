@@ -50,7 +50,7 @@ const Weather = () => {
   const [loading, setLoading] = useState(true);
   const [city, setCity] = useState('guangzhou');
 
-  const fetchWeather = async (latitude=null, longitude=null) => {
+  const fetchWeather = async (latitude = null, longitude = null) => {
     setLoading(true);
     try {
       const res = await fetch('https://ip.tryxd.cn/cyapi', {
@@ -74,24 +74,28 @@ const Weather = () => {
   };
 
 
-  // 示例：使用浏览器定位
+
   useEffect(() => {
-    fetchWeather();
+    // fetchWeather();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
-          fetchWeather(latitude, longitude);
+          if (!latitude || !longitude) {
+            console.error('定位失败，使用默认城市坐标');
+            fetchWeather(); 
+          } else {
+            fetchWeather(latitude, longitude);
+          }
         },
         (err) => {
           console.error('定位失败:', err);
-          // 可选：fallback 到默认城市坐标
-          fetchWeather(23.1291, 113.2644); // 广州
+          fetchWeather(); 
         }
       );
     } else {
       console.error('浏览器不支持定位');
-      fetchWeather(23.1291, 113.2644); // fallback
+      fetchWeather(); // fallback
     }
   }, []);
 

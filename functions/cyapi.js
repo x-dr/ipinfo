@@ -1,4 +1,6 @@
 export async function onRequest({ request }) {
+    let latitude, longitude;
+
 
     if (request.method === 'OPTIONS') {
         // 处理 CORS 预检请求
@@ -11,11 +13,22 @@ export async function onRequest({ request }) {
             },
         });
     }
-    const geo = request.eo;
+
+    if (request.method == 'POST') {
+        const body = await request.json();
+        latitude = body.latitude;
+        longitude = body.longitude;
+    }
+
+    if (!latitude || !longitude) {
+        latitude = request.eo?.geo?.latitude;
+        longitude = request.eo?.geo?.longitude;
+    }
+
     let mtjson = {};
     try {
         const mtdata = await fetch(
-            `https://apimobile.meituan.com/group/v1/city/latlng/${geo.geo.latitude},${geo.geo.longitude}?tag=0`
+            `https://apimobile.meituan.com/group/v1/city/latlng/${latitude},${longitude}?tag=0`
         );
         mtjson = await mtdata.json();
     } catch (error) {
@@ -24,7 +37,7 @@ export async function onRequest({ request }) {
     }
     try {
         // const targetUrl = `https://starplucker.cyapi.cn/v3/alert/location?latitude=${geo.geo.latitude}&longitude=${geo.geo.longitude}`;
-        const weatherUrl = `https://api.caiyunapp.com/v2.5/Y2FpeXVuX25vdGlmeQ==/${geo.geo.longitude},${geo.geo.latitude}/weather?dailysteps=16&hourlysteps=120&alert=true&begin=${Math.round(new Date().getTime() / 1000)}`;
+        const weatherUrl = `https://api.caiyunapp.com/v2.5/Y2FpeXVuX25vdGlmeQ==/${longitude},${latitude}/weather?dailysteps=16&hourlysteps=120&alert=true&begin=${Math.round(new Date().getTime() / 1000)}`;
         const headers = {
             'Host': 'api.caiyunapp.com',
             'Connection': 'keep-alive',
