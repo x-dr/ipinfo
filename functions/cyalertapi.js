@@ -1,5 +1,16 @@
 export async function onRequest({ request }) {
     const geo = request.eo;
+    let mtjson = {};
+
+    try {
+        const mtdata = await fetch(
+            `https://apimobile.meituan.com/group/v1/city/latlng/${geo.geo.latitude},${geo.geo.longitude}?tag=0`
+        );
+        mtjson = await mtdata.json();
+    } catch (error) {
+        console.log('获取美团城市数据失败：', error);
+
+    }
 
     try {
         const targetUrl = `https://starplucker.cyapi.cn/v3/alert/location?latitude=${geo.geo.latitude}&longitude=${geo.geo.longitude}`;
@@ -24,6 +35,7 @@ export async function onRequest({ request }) {
 
         const data = JSON.stringify({
             data: body,
+            mtjson: mtjson || {},
         });
 
         return new Response(data, {

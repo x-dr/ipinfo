@@ -92,7 +92,10 @@ const WeatherDemo = () => {
   }));
 
   const tempChartOption = {
-    title: { text: '未来24小时温度变化' },
+    title: {
+      text: '未来24小时温度变化',
+      left: 'center'
+    },
     tooltip: { trigger: 'axis' },
     xAxis: {
       type: 'category',
@@ -131,6 +134,51 @@ const WeatherDemo = () => {
   };
 
 
+  const precipitationMinuteChartOption = {
+    title: {
+      text: '未来2小时降水强度（逐分钟）',
+      subtext: `${weather.minutely.description}（数据来源：彩云天气）`,
+      left: 'center',
+    },
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params) => {
+        const minute = params[0].axisValue;
+        const value = params[0].data;
+        return `+${minute}分钟<br/>降水强度：${value} mm/h`;
+      },
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: Array.from({ length: 120 }, (_, i) => i), // 0~119 分钟
+      name: '分钟',
+      axisLabel: {
+        formatter: (val) => (val % 10 === 0 ? `+${val}m` : ''),
+      },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'mm/h',
+      min: 0,
+    },
+    series: [
+      {
+        name: '降水强度',
+        type: 'line',
+        data: weather.minutely.precipitation_2h,
+        areaStyle: {
+          color: '#cce5ff',
+        },
+        smooth: true,
+        lineStyle: {
+          color: '#3399ff',
+        },
+      },
+    ],
+  };
+
+
   return (
     <div className="weather-container">
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -157,7 +205,16 @@ const WeatherDemo = () => {
           />
         ))}
 
-        <Card title="当前天气">
+        <Card
+          title={null} // 不使用默认标题
+
+        >
+          <div style={{ textAlign: 'center', padding: '1px 0' }}>
+            <h3 >当前天气</h3>
+            <div style={{ color: '#888', textAlign: 'center', marginBottom: 12 }}>
+              {weather.forecast_keypoint}
+            </div>
+          </div>
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={8}>
               <Card title="温度">{hourly.temperature[0].value} ℃</Card>
@@ -206,11 +263,17 @@ const WeatherDemo = () => {
           </Row>
         </Card>
 
+        <Card  title={null}>
+          <ReactECharts
+            option={precipitationMinuteChartOption}
+            style={{ width: '100%', height: 300 }}
+          />
+        </Card>
 
-        <Card title="24小时温度变化图">
+        <Card title={null}>
           <ReactECharts option={tempChartOption} style={{ width: '100%', height: 300 }} />
         </Card>
-        <Card title="24小时降水变化图">
+        <Card title={null}>
           <ReactECharts option={precipitationChartOption} style={{ width: '100%', height: 300 }} />
         </Card>
 
