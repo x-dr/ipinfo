@@ -1,9 +1,6 @@
 export async function onRequest({ request }) {
     const geo = request.eo;
   
-
-
-
     try {
         const targetUrl = `https://starplucker.cyapi.cn/v3/alert/location?latitude=${geo.geo.latitude}&longitude=${geo.geo.longitude}`;
 
