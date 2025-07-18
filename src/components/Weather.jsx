@@ -54,7 +54,9 @@ const WeatherDemo = () => {
     setLoading(true);
     try {
       const res = await axios.get(`/cyapi`); // mock json
-      setWeather(res.data.result);
+      // console.log('获取天气数据:', res.data.data.result);
+      
+      setWeather(res.data.data.result);
     } catch (err) {
       console.error('获取天气失败:', err);
     } finally {
