@@ -12,7 +12,7 @@ export async function onRequest({ request }) {
     }
     try {
         // const targetUrl = `https://starplucker.cyapi.cn/v3/alert/location?latitude=${geo.geo.latitude}&longitude=${geo.geo.longitude}`;
-        const weatherUrl = `https://api.caiyunapp.com/v2.5/Y2FpeXVuX25vdGlmeQ==/${geo.geo.longitude},${geo.geo.latitude}/weather?dailysteps=16&hourlysteps=120&alert=true&begin=${Math.round(new Date().getTime()/1000)}`;
+        const weatherUrl = `https://api.caiyunapp.com/v2.5/Y2FpeXVuX25vdGlmeQ==/${geo.geo.longitude},${geo.geo.latitude}/weather?dailysteps=16&hourlysteps=120&alert=true&begin=${Math.round(new Date().getTime() / 1000)}`;
         const headers = {
             'Host': 'api.caiyunapp.com',
             'Connection': 'keep-alive',
@@ -42,7 +42,10 @@ export async function onRequest({ request }) {
     } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*", // 开启 CORS 访问
+            },
         });
 
     }
