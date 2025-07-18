@@ -53,14 +53,17 @@ const Weather = () => {
   const fetchWeather = async (latitude, longitude) => {
     setLoading(true);
     try {
-      const res = await axios.post('https://ip.tryxd.cn/cyapi',
-        { latitude, longitude },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      const res = await fetch('https://ip.tryxd.cn/cyapi', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        // body: JSON.stringify({ latitude, longitude })
+      });
+
+      const data = await res.json();
+      console.log('获取天气数据:', data);
+      
 
       setWeather(res.data.data.result);
       setCity(res.data?.mtjson?.data || {});
@@ -73,6 +76,7 @@ const Weather = () => {
 
   // 示例：使用浏览器定位
   useEffect(() => {
+    fetchWeather();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
