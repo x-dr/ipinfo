@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, Descriptions, Button, message, Divider } from 'antd';
+import {Spin, Card, Descriptions, Button, message, Divider } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import './IPInfoPage.css';
 
@@ -157,7 +157,7 @@ function IPInfoPage() {
               </Button>
             </>
           ) : (
-            <div>正在加载 IP 信息...</div>
+            <Spin size="large" tip="加载数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen  />
           )}
         </Card>
       </div>

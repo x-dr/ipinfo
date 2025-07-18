@@ -23,26 +23,27 @@ const cityCoordMap = {
 };
 
 const skyconMap = {
-  CLEAR_DAY: '☀️',
-  CLEAR_NIGHT: '🌙',
-  PARTLY_CLOUDY_DAY: '⛅',
-  PARTLY_CLOUDY_NIGHT: '🌤️',
-  CLOUDY: '☁️',
-  LIGHT_HAZE: '🌫️',
-  MODERATE_HAZE: '🌫️',
-  HEAVY_HAZE: '🌫️',
-  LIGHT_RAIN: '🌦️',
-  MODERATE_RAIN: '🌧️',
-  HEAVY_RAIN: '🌧️',
-  STORM_RAIN: '⛈️',
-  LIGHT_SNOW: '🌨️',
-  MODERATE_SNOW: '🌨️',
-  HEAVY_SNOW: '❄️',
-  STORM_SNOW: '❄️',
-  DUST: '🌪️',
-  SAND: '🌪️',
-  WIND: '💨',
+  CLEAR_DAY: '☀️ 晴（白天）',
+  CLEAR_NIGHT: '🌙 晴（夜晚）',
+  PARTLY_CLOUDY_DAY: '⛅ 多云（白天）',
+  PARTLY_CLOUDY_NIGHT: '🌤️ 多云（夜晚）',
+  CLOUDY: '☁️ 阴天',
+  LIGHT_HAZE: '🌫️ 轻度雾霾',
+  MODERATE_HAZE: '🌫️ 中度雾霾',
+  HEAVY_HAZE: '🌫️ 重度雾霾',
+  LIGHT_RAIN: '🌦️ 小雨',
+  MODERATE_RAIN: '🌧️ 中雨',
+  HEAVY_RAIN: '🌧️ 大雨',
+  STORM_RAIN: '⛈️ 暴雨',
+  LIGHT_SNOW: '🌨️ 小雪',
+  MODERATE_SNOW: '🌨️ 中雪',
+  HEAVY_SNOW: '❄️ 大雪',
+  STORM_SNOW: '❄️ 暴雪',
+  DUST: '🌪️ 扬尘',
+  SAND: '🌪️ 沙尘',
+  WIND: '💨 大风',
 };
+
 
 const WeatherDemo = () => {
   const [cityKey, setCityKey] = useState('guangzhou');
@@ -53,9 +54,9 @@ const WeatherDemo = () => {
     // const [lng, lat] = cityCoordMap[cityKey].coord;
     setLoading(true);
     try {
-      const res = await axios.get(`/cyapi`); // mock json
+      const res = await axios.get(`https://ip.tryxd.cn/cyapi`); // mock json
       // console.log('获取天气数据:', res.data.data.result);
-      
+
       setWeather(res.data.data.result);
     } catch (err) {
       console.error('获取天气失败:', err);
@@ -68,7 +69,7 @@ const WeatherDemo = () => {
     fetchWeather();
   }, []);
 
-  if (loading) return <Spin size="large" tip="加载天气数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen  />;
+  if (loading) return <Spin size="large" tip="加载天气数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen />;
   if (!weather) return <div>无天气数据</div>;
 
   const daily = weather.daily;
@@ -84,8 +85,8 @@ const WeatherDemo = () => {
 
   const dailyData = daily.temperature.map((item, idx) => ({
     key: idx,
-    date: daily.skycon[idx].date,
-    skycon: `${skyconMap[daily.skycon[idx].value] || ''} ${daily.skycon[idx].value}`,
+    date: daily.skycon[idx].date.split('T')[0],
+    skycon: `${skyconMap[daily.skycon[idx].value] || ''}`,
     max: item.max,
     min: item.min,
   }));
@@ -106,6 +107,29 @@ const WeatherDemo = () => {
       },
     ],
   };
+  const precipitationChartOption = {
+    title: {
+      text: '未来24小时降水变化',
+      subtext: weather.hourly.description, // 添加描述
+      left: 'center'
+    },
+    tooltip: { trigger: 'axis' },
+    xAxis: {
+      type: 'category',
+      data: weather.hourly.precipitation.map(item => item.datetime.slice(11, 16)),
+    },
+    yAxis: { type: 'value', name: 'mm/h' },
+    series: [
+      {
+        name: '降水强度',
+        data: weather.hourly.precipitation.map(item => item.value),
+        type: 'line',
+        smooth: true,
+        areaStyle: {}, // 添加填充区域
+      },
+    ],
+  };
+
 
   return (
     <div className="weather-container">
@@ -135,14 +159,59 @@ const WeatherDemo = () => {
 
         <Card title="当前天气">
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} md={8}><Card title="温度">{hourly.temperature[0].value} ℃</Card></Col>
-            <Col xs={24} sm={12} md={8}><Card title="湿度">{Math.round(hourly.humidity[0].value * 100)}%</Card></Col>
-            <Col xs={24} sm={12} md={8}><Card title="天气">{skyconMap[hourly.skycon[0].value]} {hourly.skycon[0].value}</Card></Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="温度">{hourly.temperature[0].value} ℃</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="湿度">{Math.round(hourly.humidity[0].value * 100)}%</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="天气">{skyconMap[hourly.skycon[0].value]} </Card>
+            </Col>
+
+            {/* 新增卡片内容 */}
+            <Col xs={24} sm={12} md={8}>
+              <Card title="体感温度">{weather.realtime.apparent_temperature} ℃</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="云量">{Math.round(weather.realtime.cloudrate * 100)}%</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="能见度">{weather.realtime.visibility} km</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="紫外线">{weather.realtime.life_index.ultraviolet.desc}</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="舒适度">{weather.realtime.life_index.comfort.desc}</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="空气质量">{weather.realtime.air_quality.description.chn} (PM2.5: {weather.realtime.air_quality.pm25})</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="风速">{weather.realtime.wind.speed} m/s</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="风向">{weather.realtime.wind.direction.toFixed(0)}°</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="气压">{(weather.realtime.pressure / 100).toFixed(1)} hPa</Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="降水强度">
+                本地 {weather.realtime.precipitation.local.intensity} mm/h<br />
+                附近 {weather.realtime.precipitation.nearest.intensity} mm/h（距离 {weather.realtime.precipitation.nearest.distance} km）
+              </Card>
+            </Col>
           </Row>
         </Card>
 
+
         <Card title="24小时温度变化图">
           <ReactECharts option={tempChartOption} style={{ width: '100%', height: 300 }} />
+        </Card>
+        <Card title="24小时降水变化图">
+          <ReactECharts option={precipitationChartOption} style={{ width: '100%', height: 300 }} />
         </Card>
 
         <Card title="16日天气预报">
