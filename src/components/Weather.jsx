@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import "echarts/i18n/langFR";
+
 import {
   Table,
   Card,
@@ -57,7 +59,7 @@ const Weather = () => {
   const fetchWeather = async (latitude = null, longitude = null) => {
     setLoading(true);
     try {
-      const res = await fetch('/cyapi', {
+      const res = await fetch('https://ipinfo.tryxd.cn/cyapi', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -181,11 +183,21 @@ const Weather = () => {
   };
 
   const precipitationChartOption = {
-    title: {
-      text: '未来24小时降水变化',
-      subtext: weather.hourly.description,
-      left: 'center'
-    },
+    title: [
+      {
+        text: '未来24小时降水变化',
+        left: 'center'
+      },
+      {
+        subtext: weather.hourly.description,
+        left: 'right',
+        top: 18,
+        textStyle: {
+          fontSize: 12,
+          color: '#888'
+        }
+      }
+    ],
     tooltip: {
       trigger: 'axis',
       formatter: function (params) {
@@ -215,11 +227,22 @@ const Weather = () => {
 
 
   const precipitationMinuteChartOption = {
-    title: {
-      text: '未来2小时降水强度（逐分钟）',
-      subtext: `${weather.minutely.description}（数据来源：彩云天气）`,
-      left: 'center',
-    },
+    title: [
+      {
+        text: '未来2小时降水强度（逐分钟）',
+        left: 'center'
+      },
+      {
+        subtext: `${weather.minutely.description}`,
+        left: 'right',
+        top: 18,
+        textStyle: {
+          fontSize: 12,
+          color: '#888'
+        }
+      },
+    ],
+
     tooltip: {
       trigger: 'axis',
       formatter: (params) => {
@@ -285,7 +308,7 @@ const Weather = () => {
           <div style={{ textAlign: 'center', padding: '1px 0' }}>
             <h3 >当前天气</h3>
             <div style={{ color: '#888', textAlign: 'center', marginBottom: 12 }}>
-              {weather.forecast_keypoint}
+              {weather.forecast_keypoint} （数据来源：彩云天气）
             </div>
           </div>
           <Row gutter={[16, 16]}>
@@ -342,7 +365,7 @@ const Weather = () => {
         </Card>
 
         <Card title={null}>
-          <ReactECharts option={tempChartOption} style={{ width: '100%', height: 300 }} />
+          <ReactECharts option={tempChartOption} style={{ width: '100%', height: 300 }} opts={{ locale: 'FR' }} />
         </Card>
         <Card title={null}>
           <ReactECharts option={precipitationChartOption} style={{ width: '100%', height: 300 }} />
