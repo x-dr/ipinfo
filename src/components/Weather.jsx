@@ -46,12 +46,10 @@ const skyconMap = {
 
 
 const WeatherDemo = () => {
-  const [cityKey, setCityKey] = useState('guangzhou');
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchWeather = async () => {
-    // const [lng, lat] = cityCoordMap[cityKey].coord;
     setLoading(true);
     try {
       const res = await axios.get(`https://ip.tryxd.cn/cyapi`); // mock json
@@ -182,18 +180,6 @@ const WeatherDemo = () => {
   return (
     <div className="weather-container">
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        {/* <Title level={2} className="weather-title">🌤 彩云天气</Title> */}
-
-        {/* <Select
-          value={cityKey}
-          onChange={(v) => setCityKey(v)}
-          options={Object.entries(cityCoordMap).map(([key, val]) => ({
-            label: val.name,
-            value: key,
-          }))}
-          style={{ width: 200 }}
-        /> */}
-
         {alerts.length > 0 && alerts.map((item, idx) => (
           <Alert
             key={idx}
@@ -207,7 +193,6 @@ const WeatherDemo = () => {
 
         <Card
           title={null} // 不使用默认标题
-
         >
           <div style={{ textAlign: 'center', padding: '1px 0' }}>
             <h3 >当前天气</h3>

@@ -124,8 +124,8 @@ function IPInfoPage() {
     <div className={`app-container `}>
       <div>
         <Card
-          title="IP 信息查询"
-          variant="borderless"
+          title={null}
+          // variant="borderless"
           className="card-wrapper"
           loading={loading}
         >
