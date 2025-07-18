@@ -1,4 +1,16 @@
 export async function onRequest({ request }) {
+
+    if (request.method === 'OPTIONS') {
+        // 处理 CORS 预检请求
+        return new Response(null, {
+            status: 204,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
+        });
+    }
     const geo = request.eo;
     let mtjson = {};
     try {
@@ -34,8 +46,9 @@ export async function onRequest({ request }) {
         return new Response(data, {
             status: res.status,
             headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*", // 开启 CORS 访问
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
             },
         });
 
@@ -43,8 +56,9 @@ export async function onRequest({ request }) {
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
             headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*", // 开启 CORS 访问
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
             },
         });
 

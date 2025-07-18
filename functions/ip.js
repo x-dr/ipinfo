@@ -26,9 +26,10 @@ export async function onRequest({ request }) {
     meituan: mtjson || {},
   });
   return new Response(res, {
-    headers: {
-      'content-type': 'application/json; charset=UTF-8',
-      'Access-Control-Allow-Origin': '*',
-    },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
   });
 }

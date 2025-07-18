@@ -50,21 +50,22 @@ const Weather = () => {
   const [loading, setLoading] = useState(true);
   const [city, setCity] = useState('guangzhou');
 
-  const fetchWeather = async (latitude, longitude) => {
+  const fetchWeather = async () => {
     setLoading(true);
     try {
       const res = await fetch('https://ip.tryxd.cn/cyapi', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
-        },
-        // body: JSON.stringify({ latitude, longitude })
+        }
+
       });
 
       const data = await res.json();
       console.log('获取天气数据:', data);
-      
 
+
+      // const res = await axios.get(`https://ip.tryxd.cn/cyapi`); // mock json
       setWeather(res.data.data.result);
       setCity(res.data?.mtjson?.data || {});
     } catch (err) {
@@ -74,30 +75,12 @@ const Weather = () => {
     }
   };
 
-  // 示例：使用浏览器定位
+
+
+
   useEffect(() => {
     fetchWeather();
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          fetchWeather(latitude, longitude);
-        },
-        (err) => {
-          console.error('定位失败:', err);
-          // 可选：fallback 到默认城市坐标
-          fetchWeather(23.1291, 113.2644); // 广州
-        }
-      );
-    } else {
-      console.error('浏览器不支持定位');
-      fetchWeather(23.1291, 113.2644); // fallback
-    }
-  }, [])
-
-  // useEffect(() => {
-  //   fetchWeather();
-  // }, []);
+  }, []);
 
   if (loading) return <Spin size="large" tip="加载天气数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen />;
   if (!weather) return <div>无天气数据</div>;
