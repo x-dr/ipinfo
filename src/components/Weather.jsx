@@ -68,7 +68,7 @@ const WeatherDemo = () => {
     fetchWeather();
   }, []);
 
-  if (loading) return <Spin size="large" tip="加载天气数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} />;
+  if (loading) return <Spin size="large" tip="加载天气数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen  />;
   if (!weather) return <div>无天气数据</div>;
 
   const daily = weather.daily;
