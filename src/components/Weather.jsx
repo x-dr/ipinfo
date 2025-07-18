@@ -229,42 +229,40 @@ const precipitationChartOption = {
             </div>
           </div>
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="温度">{hourly.temperature[0].value} ℃</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="湿度">{Math.round(hourly.humidity[0].value * 100)}%</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="天气">{skyconMap[hourly.skycon[0].value]} </Card>
             </Col>
-
-            {/* 新增卡片内容 */}
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="体感温度">{weather.realtime.apparent_temperature} ℃</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="云量">{Math.round(weather.realtime.cloudrate * 100)}%</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="能见度">{weather.realtime.visibility} km</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="紫外线">{weather.realtime.life_index.ultraviolet.desc}</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="舒适度">{weather.realtime.life_index.comfort.desc}</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="空气质量">{weather.realtime.air_quality.description.chn} (PM2.5: {weather.realtime.air_quality.pm25})</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="风速">{weather.realtime.wind.speed} m/s</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="风向">{weather.realtime.wind.direction.toFixed(0)}°</Card>
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={12} sm={12} md={8}>
               <Card title="气压">{(weather.realtime.pressure / 100).toFixed(1)} hPa</Card>
             </Col>
             <Col xs={24} sm={12} md={8}>
