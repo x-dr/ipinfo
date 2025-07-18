@@ -14,7 +14,12 @@ import ReactECharts from 'echarts-for-react';
 import './Weather.css';
 
 const { Title } = Typography;
-
+const contentStyle = {
+  padding: 50,
+  // background: 'rgba(0, 0, 0, 0.05)',
+  borderRadius: 4,
+};
+const content = <div style={contentStyle} />;
 const cityCoordMap = {
   guangzhou: { name: '广州', coord: [113.37059678819445, 23.13521240234375] },
   beijing: { name: '北京', coord: [116.407396, 39.9042] },
@@ -75,34 +80,56 @@ const Weather = () => {
 
 
   useEffect(() => {
-    // fetchWeather();
-    if (navigator.geolocation) {
+    const loadWeather = () => {
+      if (!navigator.geolocation) {
+        console.error("浏览器不支持定位");
+        fetchWeather();
+        return;
+      }
+
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          if (!latitude || !longitude) {
-            console.error('定位失败，使用默认城市坐标');
-            fetchWeather(); 
-          } else {
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          if (latitude && longitude) {
             fetchWeather(latitude, longitude);
+          } else {
+            console.error("坐标无效，使用默认城市");
+            fetchWeather();
           }
         },
-        (err) => {
-          console.error('定位失败:', err);
-          fetchWeather(); 
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              console.error("用户拒绝了定位请求");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.error("位置信息不可用");
+              break;
+            case error.TIMEOUT:
+              console.error("定位请求超时");
+              break;
+            default:
+              console.error("定位失败:", error.message);
+          }
+          fetchWeather(); // fallback
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 3000,
+          maximumAge: 0,
         }
       );
-    } else {
-      console.error('浏览器不支持定位');
-      fetchWeather(); // fallback
-    }
+    };
+
+    loadWeather();
   }, []);
 
-  // useEffect(() => {
-  //   fetchWeather();
-  // }, []);
 
-  if (loading) return <Spin size="large" tip="加载天气数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen />;
+
+
+  if (loading) return <Spin size="large" tip="加载天气数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }}    >
+    {content}
+  </Spin>;
   if (!weather) return <div>无天气数据</div>;
 
   const daily = weather.daily;
