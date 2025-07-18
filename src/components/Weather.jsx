@@ -53,7 +53,7 @@ const Weather = () => {
   const fetchWeather = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`https://ip.tryxd.cn/cyapi`); // mock json
+      const res = await axios.get(`/cyapi`); // mock json
       // console.log('获取天气数据:', res.data.data.result);
 
       setWeather(res.data.data.result);
