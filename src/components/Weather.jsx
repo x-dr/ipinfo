@@ -12,7 +12,7 @@ import {
   Space,
 } from 'antd';
 import ReactECharts from 'echarts-for-react';
-import './WeatherDemo.css';
+import './Weather.css';
 
 const { Title } = Typography;
 
@@ -45,9 +45,10 @@ const skyconMap = {
 };
 
 
-const WeatherDemo = () => {
+const Weather = () => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [city, setCity] = useState('guangzhou');
 
   const fetchWeather = async () => {
     setLoading(true);
@@ -56,6 +57,7 @@ const WeatherDemo = () => {
       // console.log('获取天气数据:', res.data.data.result);
 
       setWeather(res.data.data.result);
+      setCity(res.data?.mtjson?.data || {});
     } catch (err) {
       console.error('获取天气失败:', err);
     } finally {
@@ -89,47 +91,67 @@ const WeatherDemo = () => {
     min: item.min,
   }));
 
-  const tempChartOption = {
-    title: {
-      text: '未来24小时温度变化',
-      left: 'center'
+const tempChartOption = {
+  title: {
+    text: '未来24小时温度变化',
+    left: 'center'
+  },
+  tooltip: {
+    trigger: 'axis',
+    formatter: function (params) {
+      const item = params[0];
+      return `${item.axisValue} 时<br/>温度：${item.data} ℃`;
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: hourly.temperature.map(item => item.datetime.slice(11, 16)),
+  },
+  yAxis: {
+    type: 'value',
+    name: '℃'
+  },
+  series: [
+    {
+      data: hourly.temperature.map(item => item.value),
+      type: 'line',
+      smooth: true,
     },
-    tooltip: { trigger: 'axis' },
-    xAxis: {
-      type: 'category',
-      data: hourly.temperature.map(item => item.datetime.slice(11, 16)),
+  ],
+};
+
+const precipitationChartOption = {
+  title: {
+    text: '未来24小时降水变化',
+    subtext: weather.hourly.description,
+    left: 'center'
+  },
+  tooltip: {
+    trigger: 'axis',
+    formatter: function (params) {
+      const item = params[0];
+      return `${item.axisValue} 时<br/>降水强度：${item.data} mm/h`;
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: weather.hourly.precipitation.map(item => item.datetime.slice(11, 16)),
+  },
+  yAxis: {
+    type: 'value',
+    name: 'mm/h'
+  },
+  series: [
+    {
+      name: '降水强度',
+      data: weather.hourly.precipitation.map(item => item.value),
+      type: 'line',
+      smooth: true,
+      areaStyle: {},
     },
-    yAxis: { type: 'value', name: '℃' },
-    series: [
-      {
-        data: hourly.temperature.map(item => item.value),
-        type: 'line',
-        smooth: true,
-      },
-    ],
-  };
-  const precipitationChartOption = {
-    title: {
-      text: '未来24小时降水变化',
-      subtext: weather.hourly.description, // 添加描述
-      left: 'center'
-    },
-    tooltip: { trigger: 'axis' },
-    xAxis: {
-      type: 'category',
-      data: weather.hourly.precipitation.map(item => item.datetime.slice(11, 16)),
-    },
-    yAxis: { type: 'value', name: 'mm/h' },
-    series: [
-      {
-        name: '降水强度',
-        data: weather.hourly.precipitation.map(item => item.value),
-        type: 'line',
-        smooth: true,
-        areaStyle: {}, // 添加填充区域
-      },
-    ],
-  };
+  ],
+};
+
 
 
   const precipitationMinuteChartOption = {
@@ -180,6 +202,12 @@ const WeatherDemo = () => {
   return (
     <div className="weather-container">
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={5} style={{ textAlign: 'center' }}>
+          {city?.province ? `${city.province}省 ` : ''}
+          {city?.city ? `${city.city}市 ` : ''}
+          {city?.district || ''}
+        </Title>
+
         {alerts.length > 0 && alerts.map((item, idx) => (
           <Alert
             key={idx}
@@ -248,7 +276,7 @@ const WeatherDemo = () => {
           </Row>
         </Card>
 
-        <Card  title={null}>
+        <Card title={null}>
           <ReactECharts
             option={precipitationMinuteChartOption}
             style={{ width: '100%', height: 300 }}
@@ -276,4 +304,4 @@ const WeatherDemo = () => {
   );
 };
 
-export default WeatherDemo;
+export default Weather;
