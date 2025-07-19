@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {Spin, Card, Descriptions, Button, message, Divider } from 'antd';
+import { Spin, Card, Descriptions, Button, message, Divider } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import './IPInfoPage.css';
 
@@ -9,6 +9,8 @@ import './IPInfoPage.css';
 function IPInfoPage() {
   const [ipInfo, setIpInfo] = useState(null);
   const [ipIntInfo, setIpIntInfo] = useState({ ip: '获取中...' });
+  const [geoInfo, setGeoInfo] = useState("获取中..."); // 🌐 位置溯源数据
+
   const [loading, setLoading] = useState(false);
 
 
@@ -115,7 +117,46 @@ function IPInfoPage() {
   };
 
 
-
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      console.error("浏览器不支持定位");
+      return;
+    }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const res = await fetch('/mtsy', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ latitude, longitude }),
+            });
+            const data = await res.json();
+            console.log('位置溯源数据：', data);
+            
+            setGeoInfo(data);
+          } catch (err) {
+            console.error('获取位置溯源失败：', err);
+            setGeoInfo({ error: '位置溯源失败' });
+          }
+        },
+        (err) => {
+          console.warn('定位失败：', err.message);
+          setGeoInfo({ error: '无法获取定位' });
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 3000,
+          maximumAge: 0,
+        }
+      );
+    } else {
+      setGeoInfo({ error: '浏览器不支持定位' });
+    }
+  }, []);
 
   return (
 
@@ -157,7 +198,7 @@ function IPInfoPage() {
               </Button>
             </>
           ) : (
-            <Spin size="large" tip="加载数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen  />
+            <Spin size="large" tip="加载数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen />
           )}
         </Card>
       </div>
