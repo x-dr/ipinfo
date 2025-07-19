@@ -8,6 +8,7 @@ import GeolocationComponent from './components/GeolocationComponent';
 const items = [
     { key: '/weather', label: '🌤 天气预报' },
     { key: '/ipinfo', label: '🌐 IP 信息' },
+    { key: '/geolocation', label: '📍 位置定位' },
 ];
 
 const App = () => {
@@ -45,6 +46,7 @@ const App = () => {
                     <Route path="*" element={<Weather />} />
                     <Route path="/weather" element={<Weather />} />
                     <Route path="/ipinfo" element={<IPInfoPage />} />
+                    <Route path="/geolocation" element={<GeolocationComponent />} />
                     
                 </Routes>
             </div>
