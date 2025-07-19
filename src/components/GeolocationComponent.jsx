@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Card, Typography, Spin, Alert } from 'antd';
+
+const { Title, Paragraph, Text } = Typography;
 
 function GeolocationComponent() {
   const [location, setLocation] = useState(null);
@@ -24,17 +27,22 @@ function GeolocationComponent() {
   }, []);
 
   return (
-    <div>
-      <h3>用户定位信息</h3>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <Card
+      style={{ maxWidth: 400, margin: '40px auto', textAlign: 'center' }}
+      hoverable
+    >
+      <Title level={3}>用户定位信息</Title>
+
+      {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 20 }} />}
+
       {location ? (
-        <p>
-          纬度：{location.latitude}，经度：{location.longitude}
-        </p>
+        <Paragraph>
+          纬度：<Text strong>{location.latitude}</Text>，经度：<Text strong>{location.longitude}</Text>
+        </Paragraph>
       ) : !error ? (
-        <p>正在获取定位信息...</p>
+        <Spin tip="正在获取定位信息..." size="large" />
       ) : null}
-    </div>
+    </Card>
   );
 }
 
