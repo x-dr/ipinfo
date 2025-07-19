@@ -43,10 +43,11 @@ const App = () => {
 
             <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
                 <Routes>
+                    <Route path="*" element={<Weather />} />
                     <Route path="/weather" element={<Weather />} />
                     <Route path="/ipinfo" element={<IPInfoPage />} />
                     <Route path="/geolocation" element={<GeolocationComponent />} />
-                    <Route path="*" element={<Weather />} />
+                    
                 </Routes>
             </div>
         </div>
