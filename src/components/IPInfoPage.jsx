@@ -135,17 +135,22 @@ function IPInfoPage() {
               body: JSON.stringify({ latitude, longitude }),
             });
             const data = await res.json();
-            console.log('位置溯源数据：', data);
-            
-            setGeoInfo(data);
+            const mtsy = data?.data || {};
+            const sydata = meituan
+              ? `${mtsy.country || ''} ${mtsy.province || ''} ${mtsy.city || ''}` +
+              `${mtsy.district || ''}${mtsy.detail || ''}${mtsy.areaName ? `(${mtsy.areaName})` : ''}`
+              : '定位信息不可用'
+
+
+            setGeoInfo(sydata);
           } catch (err) {
             console.error('获取位置溯源失败：', err);
-            setGeoInfo({ error: '位置溯源失败' });
+            setGeoInfo('位置溯源失败');
           }
         },
         (err) => {
           console.warn('定位失败：', err.message);
-          setGeoInfo({ error: '无法获取定位' });
+          setGeoInfo('无法获取定位');
         },
         {
           enableHighAccuracy: false,
@@ -154,7 +159,7 @@ function IPInfoPage() {
         }
       );
     } else {
-      setGeoInfo({ error: '浏览器不支持定位' });
+      setGeoInfo('浏览器不支持定位');
     }
   }, []);
 
@@ -179,6 +184,7 @@ function IPInfoPage() {
                 <Descriptions.Item label="城市">{ipInfo.city}</Descriptions.Item>
                 <Descriptions.Item label="区县">{ipInfo.district || '-'}</Descriptions.Item>
                 <Descriptions.Item label="IP 溯源">{ipInfo.ipdetail || '-'}</Descriptions.Item>
+                <Descriptions.Item label="位置溯源">{geoInfo}</Descriptions.Item>
                 <Descriptions.Item label="经度">{ipInfo.longitude}</Descriptions.Item>
                 <Descriptions.Item label="纬度">{ipInfo.latitude}</Descriptions.Item>
                 <Descriptions.Item label="境外IP">{ipIntInfo.ip}</Descriptions.Item>
