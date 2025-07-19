@@ -59,7 +59,7 @@ const Weather = () => {
   const fetchWeather = async (latitude = null, longitude = null) => {
     setLoading(true);
     try {
-      const res = await fetch('https://ipinfo.tryxd.cn/cyapi', {
+      const res = await fetch('/cyapi', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
