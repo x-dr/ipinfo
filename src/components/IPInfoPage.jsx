@@ -136,7 +136,7 @@ function IPInfoPage() {
             });
             const data = await res.json();
             const mtsy = data?.data || {};
-            const sydata = meituan
+            const sydata = mtsy
               ? `${mtsy.country || ''} ${mtsy.province || ''} ${mtsy.city || ''}` +
               `${mtsy.district || ''}${mtsy.detail || ''}${mtsy.areaName ? `(${mtsy.areaName})` : ''}`
               : '定位信息不可用'
