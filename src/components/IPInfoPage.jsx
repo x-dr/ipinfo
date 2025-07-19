@@ -136,7 +136,7 @@ function IPInfoPage() {
             });
             const data = await res.json();
             const mtsy = data?.data?.data || {};
-            console.log('位置溯源数据：', mtsy);
+            // console.log('位置溯源数据：', mtsy);
             
             const sydata = mtsy
               ? `${mtsy.country || ''} ${mtsy.province || ''} ${mtsy.city || ''}` +
