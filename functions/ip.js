@@ -14,11 +14,13 @@ export async function onRequest({ request }) {
     });
   }
 
-  const geo = request.eo;
+  let geo = request.eo;
 
   if (request.method == 'POST') {
     const body = await request.json();
     clientIp = body.ip;
+    geo.clientIp = clientIp ? clientIp : geo.clientIp;
+
   }
   if (!clientIp) {
     clientIp = geo.clientIp;
