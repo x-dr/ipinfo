@@ -1,3 +1,9 @@
+function isValidIP(ip) {
+  const ipv4 = /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$/;
+  const ipv6 = /^(([0-9a-fA-F]{1,4}):){7}([0-9a-fA-F]{1,4})$/;
+  return ipv4.test(ip) || ipv6.test(ip);
+}
+
 export async function onRequest({ request }) {
   let clientIp;
 
@@ -24,6 +30,11 @@ export async function onRequest({ request }) {
   }
   if (!clientIp) {
     clientIp = geo.clientIp;
+  }
+
+  if (!isValidIP(clientIp)) {
+    return new Response(JSON.stringify({ error: 'Invalid IP' }), { status: 400 });
+
   }
 
   let mtjson = {};
