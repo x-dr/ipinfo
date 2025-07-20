@@ -1,19 +1,41 @@
 import { useEffect, useState } from 'react';
-import { Spin, Card, Descriptions, Button, message, Divider } from 'antd';
-import { CopyOutlined } from '@ant-design/icons';
+import { Spin, Card, Descriptions, Button, Typography, message, Divider, Input } from 'antd';
+import { CopyOutlined, SmileFilled, SmileOutlined } from '@ant-design/icons';
 import './IPInfoPage.css';
+const { Text } = Typography;
 
 
+function isValidIP(ip) {
+  const ipv4 = /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$/;
+  const ipv6 = /^(([0-9a-fA-F]{1,4}):){7}([0-9a-fA-F]{1,4})$/;
+  return ipv4.test(ip) || ipv6.test(ip);
+}
 
+function parseIpData(data, fallbackIp = '') {
+  const geo = data.geo?.geo || {};
+  const meituan = data?.meituan?.data || {};
+
+  return {
+    ip: data.geo?.clientIp || fallbackIp,
+    country: meituan.country || geo.countryName || '',
+    province: meituan.province || geo.regionName || '',
+    city: meituan.city || geo.cityName || '',
+    district: meituan.district || '',
+    longitude: geo.longitude?.toString() || '',
+    latitude: geo.latitude?.toString() || '',
+    ipdetail: meituan
+      ? `${meituan.country || ''} ${meituan.province || ''} ${meituan.city || ''}` +
+      `${meituan.district || ''}${meituan.detail || ''}${meituan.areaName ? `(${meituan.areaName})` : ''}`
+      : '定位信息不可用',
+    ua: navigator.userAgent,
+  };
+}
 
 function IPInfoPage() {
   const [ipInfo, setIpInfo] = useState(null);
   const [ipIntInfo, setIpIntInfo] = useState({ ip: '获取中...' });
-  const [geoInfo, setGeoInfo] = useState("获取中..."); // 🌐 位置溯源数据
-
+  const [geoInfo, setGeoInfo] = useState("获取中...");
   const [loading, setLoading] = useState(false);
-
-
 
   useEffect(() => {
     const fetchIpInfo = async () => {
@@ -47,23 +69,7 @@ function IPInfoPage() {
           };
         }
 
-        const geo = data.geo.geo || {};
-        const meituan = data?.meituan?.data || {};
-        setIpInfo({
-          ip: data.geo.clientIp || '',
-          country: meituan.country || geo.countryName || '',
-          province: meituan.province || geo.regionName || '',
-          city: meituan.city || geo.cityName || '',
-          district: meituan.district || "", // 你接口没提供区县，留空
-          longitude: geo.longitude?.toString() || '',
-          latitude: geo.latitude?.toString() || '',
-          ipdetail: meituan
-            ? `${meituan.country || ''} ${meituan.province || ''} ${meituan.city || ''}` +
-            `${meituan.district || ''}${meituan.detail || ''}${meituan.areaName ? `(${meituan.areaName})` : ''}`
-            : '定位信息不可用',
-          ua: navigator.userAgent, // 直接用浏览器的UA
-
-        });
+        setIpInfo(parseIpData(data));
       } catch (error) {
         message.error('获取IP信息失败：' + error.message);
       } finally {
@@ -79,134 +85,142 @@ function IPInfoPage() {
       try {
         const res = await fetch('https://ip.xxd.workers.dev/');
         const data = await res.json();
-        setIpIntInfo({
-          ip: data.clientIp || '获取失败',
-        });
+        setIpIntInfo({ ip: data.clientIp || '获取失败' });
       } catch (error) {
-        setIpIntInfo({
-          ip: '获取失败',
-        });
+        setIpIntInfo({ ip: '获取失败' });
         console.log('获取境外 IP 失败：' + error.message);
-
       }
     };
     fetchIntIpInfo();
   }, []);
 
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setGeoInfo('浏览器不支持定位');
+      return;
+    }
 
-  const handleCopy = async () => {
-    if (!ipInfo) return;
-    const text = `${ipInfo.ip} ${ipInfo.province} ${ipInfo.city}`;
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const res = await fetch('/mtsy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ latitude, longitude }),
+          });
+          const data = await res.json();
+          const mtsy = data?.data?.data || {};
+          const sydata = mtsy
+            ? `${mtsy.country || ''} ${mtsy.province || ''} ${mtsy.city || ''}` +
+            `${mtsy.district || ''}${mtsy.detail || ''}${mtsy.areaName ? `(${mtsy.areaName})` : ''}`
+            : '定位信息不可用';
+          setGeoInfo(sydata);
+        } catch (err) {
+          console.error('获取位置溯源失败：', err);
+          // setGeoInfo('位置溯源失败');
+          setGeoInfo(<span style={{ color: 'red' }}>位置溯源失败</span>);
+
+        }
+      },
+      (err) => {
+        console.warn('定位失败：', err.message);
+        setGeoInfo(<span style={{ color: 'red' }}>无法获取定位</span>);
+      },
+      { enableHighAccuracy: false, timeout: 3000, maximumAge: 0 }
+    );
+  }, []);
+
+  const handleSearchIP = async (ip) => {
+    if (!ip) return;
+    if (!isValidIP(ip)) {
+      message.warning('请输入合法的 IPv4 或 IPv6 地址');
+      return;
+    }
+
+    setLoading(true);
     try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
-      message.success('已复制 IP + 省份 + 城市 到剪贴板');
-    } catch (error) {
-      message.error('复制失败');
+      const res = await fetch('https://ip.tryxd.cn/ip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ip: ip.trim() })
+
+
+      });
+      const data = await res.json();
+      setIpInfo(parseIpData(data, ip));
+    } catch (err) {
+      message.error('查询失败：' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      console.error("浏览器不支持定位");
-      return;
-    }
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          try {
-            const res = await fetch('/mtsy', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ latitude, longitude }),
-            });
-            const data = await res.json();
-            const mtsy = data?.data?.data || {};
-            // console.log('位置溯源数据：', mtsy);
-            
-            const sydata = mtsy
-              ? `${mtsy.country || ''} ${mtsy.province || ''} ${mtsy.city || ''}` +
-              `${mtsy.district || ''}${mtsy.detail || ''}${mtsy.areaName ? `(${mtsy.areaName})` : ''}`
-              : '定位信息不可用'
-
-
-            setGeoInfo(sydata);
-          } catch (err) {
-            console.error('获取位置溯源失败：', err);
-            setGeoInfo('位置溯源失败');
-          }
-        },
-        (err) => {
-          console.warn('定位失败：', err.message);
-          setGeoInfo('无法获取定位');
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 3000,
-          maximumAge: 0,
-        }
-      );
-    } else {
-      setGeoInfo('浏览器不支持定位');
-    }
-  }, []);
-
   return (
-
-
-
-    <div className={`app-container `}>
+    <div className="app-container">
       <div>
-        <Card
-          title={null}
-          // variant="borderless"
-          className="card-wrapper"
-          loading={loading}
-        >
+        <div className="input-container">
+          <Input.Search
+            placeholder="输入 IPv4 或 IPv6 地址查询"
+            enterButton="查询"
+            onSearch={handleSearchIP}
+            allowClear
+            style={{ width: '100%', maxWidth: 400 }}
+          />
+        </div>
+
+        <Card className="card-wrapper" loading={loading}>
           {ipInfo ? (
             <>
               <Descriptions column={1} bordered>
-                <Descriptions.Item label="IP 地址">{ipInfo.ip}</Descriptions.Item>
+                <Descriptions.Item label="IP 地址">
+                  <Text
+                    copyable={{ tooltips: ['复制', '复制成功'] }}>
+                    {ipInfo.ip}
+                  </Text>
+                </Descriptions.Item>
                 <Descriptions.Item label="国家">{ipInfo.country}</Descriptions.Item>
                 <Descriptions.Item label="省份">{ipInfo.province}</Descriptions.Item>
                 <Descriptions.Item label="城市">{ipInfo.city}</Descriptions.Item>
                 <Descriptions.Item label="区县">{ipInfo.district || '-'}</Descriptions.Item>
-                <Descriptions.Item label="IP 溯源">{ipInfo.ipdetail || '-'}</Descriptions.Item>
-                <Descriptions.Item label="位置溯源">{geoInfo}</Descriptions.Item>
+                <Descriptions.Item label="IP 溯源">
+                  <Text copyable={{ tooltips: ['复制', '复制成功'] }}>
+                    {ipInfo.ipdetail}
+                  </Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="位置溯源">
+                  <Text copyable={{ tooltips: ['复制', '复制成功'] }}>
+                    {geoInfo}
+                  </Text>
+                </Descriptions.Item>
                 <Descriptions.Item label="经度">{ipInfo.longitude}</Descriptions.Item>
                 <Descriptions.Item label="纬度">{ipInfo.latitude}</Descriptions.Item>
-                <Descriptions.Item label="境外IP">{ipIntInfo.ip}</Descriptions.Item>
+                <Descriptions.Item label="境外IP">
+                  <Text copyable={{ tooltips: ['复制', '复制成功'] }}>
+                    {ipIntInfo.ip}
+                  </Text>
+                </Descriptions.Item>
+
                 <Descriptions.Item label="浏览器 UA">
-                  <div style={{ wordBreak: 'break-all' }}>{ipInfo.ua}</div>
+                  <div style={{ wordBreak: 'break-all' }}>
+                    <Text copyable={{ tooltips: ['复制', '复制成功'] }}>
+                      {ipInfo.ua}
+                    </Text>
+                  </div>
                 </Descriptions.Item>
               </Descriptions>
-
               <Divider />
-              <Button
-                type="primary"
-                icon={<CopyOutlined />}
-                onClick={handleCopy}
-                disabled={loading}
-              >
-                复制 IP + 省份 + 城市
-              </Button>
+
             </>
           ) : (
-            <Spin size="large" tip="加载数据中..." style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }} fullscreen />
+            <Spin
+              size="large"
+              tip="加载数据中..."
+              style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }}
+              fullscreen
+            />
           )}
         </Card>
       </div>
